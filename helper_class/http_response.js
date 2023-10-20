@@ -12,7 +12,6 @@ module.exports = class HttpResponse{
     }
 
     send({header={},body,statusCode=200}){
-        console.log(this.response)
         if(!this.response){
             this.response.end();
             return;
