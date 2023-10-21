@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 
 const port  = process.env.PORT || 5001;
 
+connectDB()
 // middleware For parsing application/json
 app.use(express.json());
 
