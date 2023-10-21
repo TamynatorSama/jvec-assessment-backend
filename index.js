@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express')
 const app = express();
 const appRouter = require('./router/index')
+const connectDB = require('./database/db_connect')
+const mongoose = require('mongoose')
 
 const port  = process.env.PORT || 5001;
 
@@ -10,11 +12,14 @@ app.use(express.json());
 
 
 app.use('/api',appRouter);
+
+mongoose.connection.once('open',()=>{
+    app.listen(port, function (err) {
+        if (err) console.log(err);
+        console.log("Server listening on PORT", port);
+    });
+})
  
-app.listen(port, function (err) {
-    if (err) console.log(err);
-    console.log("Server listening on PORT", port);
-});
 
 
 
