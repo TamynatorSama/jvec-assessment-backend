@@ -1,5 +1,5 @@
 const connect = require("../database/db_connect")
-const ContactModel = require('../model/contact_model')
+const ContactModel = require('../model/user_model')
 
 exports.createContact= async(req,res)=>{
     const db = await connect.connect();
