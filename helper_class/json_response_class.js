@@ -13,7 +13,7 @@ class SuccessResponse extends JsonResponse{
         this.result = result
     }
 
-    toJson(){
+    toJSON(){
         return {
             status:"Success",
             statusCode: this.statusCode,
@@ -26,12 +26,12 @@ class SuccessResponse extends JsonResponse{
 
 class ErrorResponse extends JsonResponse{
 
-    constructor({message,statusCode,error=null}){
+    constructor({message,statusCode,error=undefined}){
         super(message,statusCode)
-        this.result = error
+        this.error = error
     }
 
-    toJson(){
+    toJSON(){
         return {
             status:"Failure",
             statusCode: this.statusCode,
