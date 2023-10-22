@@ -17,10 +17,10 @@ const login = async(req,res)=>{
             "Password field is required"
         ]:undefined
 
-        return res.status(400).json(
+        return res.status(422).json(
             new ErrorResponse({
                 message:"Validation Error",
-                statusCode:400,
+                statusCode:422,
                 error:{
                     email:emailVal,
                     password:passwordVal
@@ -51,7 +51,7 @@ const login = async(req,res)=>{
                 expiresIn: "30d"
             }
         )
-        return res.status(401).json(
+        return res.status(200).json(
             new SuccessResponse({
                 message:"Authentication successful",
                 statusCode:200,
@@ -92,10 +92,10 @@ const registerUser=async(req,res)=>{
             "Password field is required"
         ]:undefined
 
-        return res.status(400).json(
+        return res.status(422).json(
             new ErrorResponse({
                 message:"Validation Error",
-                statusCode:400,
+                statusCode:422,
                 error:{
                     email:emailVal,
                     password:passwordVal,
@@ -120,7 +120,7 @@ const registerUser=async(req,res)=>{
         email,
         password:hashedPassword
     })
-    let user  = await newUser.save().then((value)=>value.lean())
+    let user  = await newUser.save()
 
     const accessToken = jwt.sign(
         {
@@ -130,7 +130,7 @@ const registerUser=async(req,res)=>{
             expiresIn: "30d"
         })
 
-    return res.status(401).json(
+    return res.status(200).json(
         new SuccessResponse({
             message:"Authentication successful",
             statusCode:200,
