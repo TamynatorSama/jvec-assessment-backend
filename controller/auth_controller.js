@@ -1,5 +1,6 @@
 require('dotenv').config()
 const userModel = require('../model/user_model')
+const tokenBlack = require('../model/token_blacklist')
 const bcrypt = require('bcrypt')
 const {SuccessResponse,ErrorResponse} = require('../helper_class/json_response_class')
 const jwt = require('jsonwebtoken')
@@ -72,9 +73,6 @@ const login = async(req,res)=>{
     }
 
 
-
-    
-
 }
 
 
@@ -144,6 +142,25 @@ const registerUser=async(req,res)=>{
 
 }
 
+
+const logout= async(req,res)=>{
+    const authHeader = req.headers["authorization"];
+    const blacklist = new tokenBlack({
+        user_id: req.user_id,
+        access_token: authHeader
+    })
+
+    await blacklist.save();
+
+    return res.status(200).json(
+        new SuccessResponse({
+            message:"Logout successful",
+            statusCode:200,
+        })
+    )
+
+}
+
 module.exports ={
-    login,registerUser
+    login,registerUser,logout
 }

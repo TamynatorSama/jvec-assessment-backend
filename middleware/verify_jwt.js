@@ -1,28 +1,40 @@
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
-const {ErrorResponse} = require('../helper_class/json_response_class')
+const tokenBlack = require('../model/token_blacklist')
+const { ErrorResponse } = require('../helper_class/json_response_class')
 
 
-const verifyJWT = (req,res,nxt)=>{
+const verifyJWT = async (req, res, nxt) => {
     const authHeader = req.headers["authorization"];
-    if(!authHeader)
+    if (!authHeader)
         return res.status(401).json(
             new ErrorResponse({
-                message:"Unauthorized access",
-                statusCode:401,
+                message: "Unauthorized access",
+                statusCode: 401,
             })
         )
     const jwtToken = authHeader.split(' ')[1]
 
-    jwt.verify(jwtToken,process.env.JWT_SECRET,(err,decoded)=>{
-        if(err) 
-        return res.status(403).json(
-            new ErrorResponse({
-                message:"Forbidden",
-                statusCode:403,
-            }))
-            req.user_id = decoded.user_id
-            nxt()
+    const blackList = await tokenBlack.findOne({ "user_id": req.user_id, "token": authHeader})
+    if (blackList) {
+        if (!authHeader)
+            return res.status(401).json(
+                new ErrorResponse({
+                    message: "Unauthorized access",
+                    statusCode: 401,
+                })
+            )
+    }
+
+    jwt.verify(jwtToken, process.env.JWT_SECRET, (err, decoded) => {
+        if (err)
+            return res.status(403).json(
+                new ErrorResponse({
+                    message: "Forbidden",
+                    statusCode: 403,
+                }))
+        req.user_id = decoded.user_id
+        nxt()
     })
 }
 

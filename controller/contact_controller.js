@@ -135,7 +135,6 @@ exports.contactPictureUpload = async(req,res)=>{
             message: "Resource not found",
             statusCode: 404,
         }))
-    console.log(req.files.profile_picture.name)
     let fileName = req.user_id +req.files.profile_picture.name.replace(path.extname(req.files.profile_picture.name),"") +path.extname(req.files.profile_picture.name)
     const filePath = path.join(__dirname,"..",'profile',fileName)
     req.files.profile_picture.mv(filePath,(err)=>{
