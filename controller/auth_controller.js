@@ -29,7 +29,7 @@ const login = async(req,res)=>{
         )
     }
 
-    let foundUser = await userModel.findOne({"email":email})
+    let foundUser = await userModel.findOne({"email":email.toLowerCase()})
 
     if(!foundUser){
         return res.status(401).json(
@@ -40,7 +40,7 @@ const login = async(req,res)=>{
         )
     }
 
-    let match = bcrypt.compare(password,foundUser.password)
+    let match = await bcrypt.compare(password,foundUser.password)
 
     if(match){
         const accessToken = jwt.sign(
@@ -56,6 +56,7 @@ const login = async(req,res)=>{
                 message:"Authentication successful",
                 statusCode:200,
                 result:{
+                    user_payload:foundUser,
                     token: accessToken
                 }
             })
@@ -104,7 +105,7 @@ const registerUser=async(req,res)=>{
             })
         )
     }
-    let foundUser = await userModel.findOne({"email":email})
+    let foundUser = await userModel.findOne({"email":email.toLowerCase()})
 
     if(foundUser){
         return res.status(400).json(
@@ -117,7 +118,7 @@ const registerUser=async(req,res)=>{
     let hashedPassword = await bcrypt.hash(password,10)
     let newUser = new userModel({
         full_name,
-        email,
+        email: email.toLowerCase(),
         password:hashedPassword
     })
     let user  = await newUser.save()

@@ -20,10 +20,10 @@ exports.createContact = async (req, res) => {
             "Last Name field is required"
         ] : undefined
 
-        return res.status(400).json(
+        return res.status(422).json(
             new ErrorResponse({
                 message: "Validation Error",
-                statusCode: 400,
+                statusCode: 422,
                 error: {
                     first_name: firstNameVal,
                     last_name: lastNameVal,
@@ -128,7 +128,6 @@ exports.deleteContact = async (req, res) => {
 }
 
 exports.contactPictureUpload = async(req,res)=>{
-    console.log(__dirname)
     let contactId = req.params.id;
     let contact = await contactModel.findOne({ "user_id": req.user_id ,"_id":contactId})
     if(!contact)
@@ -136,7 +135,8 @@ exports.contactPictureUpload = async(req,res)=>{
             message: "Resource not found",
             statusCode: 404,
         }))
-    let fileName = req.user_id + path.extname(req.files.profile_picture.name)
+    console.log(req.files.profile_picture.name)
+    let fileName = req.user_id +req.files.profile_picture.name.replace(path.extname(req.files.profile_picture.name),"") +path.extname(req.files.profile_picture.name)
     const filePath = path.join(__dirname,"..",'profile',fileName)
     req.files.profile_picture.mv(filePath,(err)=>{
         if(err)return res.status(500).send(new ErrorResponse({
@@ -145,7 +145,9 @@ exports.contactPictureUpload = async(req,res)=>{
         }))
     })
 
-    contact.updateOne({
+
+
+    await contact.updateOne({
         "profile_picture": fileName
     })
 
