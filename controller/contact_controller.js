@@ -1,6 +1,6 @@
 const contactModel = require('../model/contact_model')
 const { SuccessResponse, ErrorResponse } = require('../helper_class/json_response_class')
-const { ObjectId } = require("mongodb")
+const path = require('path')
 
 exports.createContact = async (req, res) => {
 
@@ -82,32 +82,6 @@ exports.updateContact = async (req, res) => {
     // getting needed fields form the request body
     const { first_name, last_name, phone_number, twitter, facebook, email } = req.body
 
-    //VALIDATING NECESSARY FIELDS
-    // if (!first_name || !last_name, !phone_number) {
-
-    //     let firstNameVal = !first_name ? [
-    //         "First Name field is required"
-    //     ] : undefined
-    //     let lastNameVal = !last_name ? [
-    //         "Last Name field is required"
-    //     ] : undefined
-    //     let phoneVal = !phone_number ? [
-    //         "Last Name field is required"
-    //     ] : undefined
-
-    //     return res.status(400).json(
-    //         new ErrorResponse({
-    //             message: "Validation Error",
-    //             statusCode: 400,
-    //             error: {
-    //                 first_name: firstNameVal,
-    //                 last_name: lastNameVal,
-    //                 phone_number: phoneVal
-    //             }
-    //         })
-    //     )
-    // }
-
     //updating the contact info
 
     try{
@@ -140,8 +114,8 @@ exports.updateContact = async (req, res) => {
 
 exports.deleteContact = async (req, res) => { 
     let contactId = req.params.id;
-    let contactList = await contactModel.findOneAndDelete({ "user_id": req.user_id ,"_id":contactId})
-    if(!contactList)
+    let contact = await contactModel.findOneAndDelete({ "user_id": req.user_id ,"_id":contactId})
+    if(!contact)
         return res.status(404).send(new ErrorResponse({
             message: "Resource not found",
             statusCode: 404,
@@ -152,3 +126,32 @@ exports.deleteContact = async (req, res) => {
     }))
 
 }
+
+exports.contactPictureUpload = async(req,res)=>{
+    let contactId = req.params.id;
+    let contact = await contactModel.findOne({ "user_id": req.user_id ,"_id":contactId})
+    if(!contact)
+        return res.status(404).send(new ErrorResponse({
+            message: "Resource not found",
+            statusCode: 404,
+        }))
+    let fileName = req.user_id + path.extname(req.files.profile_picture.name)
+    const filePath = path.join(__dirname,'profile',fileName)
+    req.files.profile_picture.mv(filePath,(err)=>{
+        if(err)return res.status(500).send(new ErrorResponse({
+            message: "Failed to upload",
+            statusCode: 500,
+        }))
+    })
+
+    contact.updateOne({
+        "profile_picture": fileName
+    })
+
+    res.status(200).send(new SuccessResponse({
+        message: "Contact Picture uploaded successfully",
+        statusCode: 200,
+        result: fileName
+    }))
+
+} 

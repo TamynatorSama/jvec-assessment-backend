@@ -10,6 +10,7 @@ const port  = process.env.PORT || 5001;
 connectDB()
 // middleware For parsing application/json
 app.use(express.json());
+app.use(express.urlencoded({extended:true}))
 
 
 app.use('/api',appRouter);
