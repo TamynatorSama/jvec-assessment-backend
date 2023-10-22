@@ -128,6 +128,7 @@ exports.deleteContact = async (req, res) => {
 }
 
 exports.contactPictureUpload = async(req,res)=>{
+    console.log(__dirname)
     let contactId = req.params.id;
     let contact = await contactModel.findOne({ "user_id": req.user_id ,"_id":contactId})
     if(!contact)
@@ -136,7 +137,7 @@ exports.contactPictureUpload = async(req,res)=>{
             statusCode: 404,
         }))
     let fileName = req.user_id + path.extname(req.files.profile_picture.name)
-    const filePath = path.join(__dirname,'profile',fileName)
+    const filePath = path.join(__dirname,"..",'profile',fileName)
     req.files.profile_picture.mv(filePath,(err)=>{
         if(err)return res.status(500).send(new ErrorResponse({
             message: "Failed to upload",
